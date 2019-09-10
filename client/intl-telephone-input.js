@@ -10,7 +10,7 @@ AutoForm.addInputType("intl-tel", {
   // },
   valueOut: function() {
     let iti = intlTelInputGlobals.getInstance(this[0]);
-    if (iti.isValidNumber()) {
+    if (iti && iti.isValidNumber()) {
       return iti.getNumber();
     } else {
       return this.val();
@@ -26,15 +26,11 @@ AutoForm.addInputType("intl-tel", {
 //   }
 // });
 
-Template["intlTelephoneInput"].helpers({
-  attsPlusFormControlClass: function addFormControlAtts() {
-    var atts = {...this.atts};
-    // Add bootstrap class
-    atts = AutoForm.Utility.addClass(atts, "form-control");
-    delete atts.intlTelInputOptions;
-    return atts;
-  }
-});
+// Template["intlTelephoneInput"].helpers({
+  // exampleHelper(p1, p2, p3) {
+  //   return "example helper result: " + p1 + "," + p2 + "," + p3;
+  // }
+// });
 
 /*
 * called when an instance of this template is inserted into the DOM.
@@ -44,14 +40,10 @@ Template["intlTelephoneInput"].helpers({
 Template["intlTelephoneInput"].onRendered(function(){
   const tmpl = Template.instance();
   let input = tmpl.$("input[type=tel]")[0];
-
-  let data = this.data;
-  let opts = data.atts.intlTelInputOptions || {
+  this.iti.set(intlTelInput(input, {
     preferredCountries: ["us","au","gb"],
     utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/15.0.2/js/utils.js"
-  };
-
-  this.iti.set(intlTelInput(input, opts));
+  }));
 });
 
 /*
@@ -67,3 +59,6 @@ Template["intlTelephoneInput"].onCreated(function(){
 Template["intlTelephoneInput_bootstrap3"].inheritsEventsFrom("intlTelephoneInput");
 Template["intlTelephoneInput_bootstrap3"].inheritsHelpersFrom("intlTelephoneInput");
 Template["intlTelephoneInput_bootstrap3"].inheritsHooksFrom("intlTelephoneInput");
+Template["intlTelephoneInput_materialize"].inheritsEventsFrom("intlTelephoneInput");
+Template["intlTelephoneInput_materialize"].inheritsHelpersFrom("intlTelephoneInput");
+Template["intlTelephoneInput_materialize"].inheritsHooksFrom("intlTelephoneInput");
