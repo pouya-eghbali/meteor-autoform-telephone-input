@@ -1,6 +1,5 @@
 import { Template } from "meteor/templating";
 import { ReactiveVar } from "meteor/reactive-var";
-import { template } from "handlebars";
 
 const intlTelInput = require("intl-tel-input");
 
@@ -41,6 +40,7 @@ AutoForm.addInputType("intl-tel", {
 Template["intlTelephoneInput"].onRendered(function () {
   const tmpl = Template.instance();
   const input = tmpl.$("input[type=tel]")[0];
+  const { intlTelOptions = {} } = tmpl.data;
   this.iti.set(
     intlTelInput(input, {
       initialCountry: "auto",
@@ -52,12 +52,12 @@ Template["intlTelephoneInput"].onRendered(function () {
       },
       preferredCountries: ["us", "au", "gb", "ch"],
       utilsScript:
-        "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/15.0.2/js/utils.js",
+        "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js",
+      ...intlTelOptions,
     })
   );
   $(input).on("keyup change", function () {
     const iti = tmpl.iti.get();
-    console.log({ iti });
     if (!iti) return;
     if (typeof intlTelInputUtils !== "undefined") {
       const currentText = iti.getNumber(intlTelInputUtils.numberFormat.E164);

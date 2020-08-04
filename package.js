@@ -12,7 +12,7 @@ Package.describe({
 });
 
 Npm.depends({
-  "intl-tel-input": "15.0.2",
+  "intl-tel-input": "17.0.3",
 });
 
 Package.onUse(function (api) {
