@@ -1,5 +1,6 @@
 import { Template } from "meteor/templating";
 import { ReactiveVar } from "meteor/reactive-var";
+import { template } from "handlebars";
 
 const intlTelInput = require("intl-tel-input");
 
@@ -8,14 +9,14 @@ AutoForm.addInputType("intl-tel", {
   // valueIn: function(val, attrs){
   //   return val;
   // },
-  valueOut: function() {
+  valueOut: function () {
     let iti = intlTelInputGlobals.getInstance(this[0]);
     if (iti && iti.isValidNumber()) {
       return iti.getNumber();
     } else {
       return this.val();
     }
-  }
+  },
 });
 
 // Template["intlTelephoneInput"].events({
@@ -37,22 +38,32 @@ AutoForm.addInputType("intl-tel", {
  * This can be a good place to apply any DOM manipulations you want, after the template is rendered for the first time.
  * e.g. jQuery plugins
  */
-Template["intlTelephoneInput"].onRendered(function() {
+Template["intlTelephoneInput"].onRendered(function () {
   const tmpl = Template.instance();
-  let input = tmpl.$("input[type=tel]")[0];
+  const input = tmpl.$("input[type=tel]")[0];
   this.iti.set(
     intlTelInput(input, {
       initialCountry: "auto",
-      geoIpLookup: function(success, failure) {
+      formatOnDisplay: true,
+      geoIpLookup: function (success, failure) {
         fetch("https://freegeoip.app/json/")
-          .then(resp => resp.json())
+          .then((resp) => resp.json())
           .then(({ country_code }) => success(country_code));
       },
       preferredCountries: ["us", "au", "gb", "ch"],
       utilsScript:
-        "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/15.0.2/js/utils.js"
+        "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/15.0.2/js/utils.js",
     })
   );
+  $(input).on("keyup change", function () {
+    const iti = tmpl.iti.get();
+    console.log({ iti });
+    if (!iti) return;
+    if (typeof intlTelInputUtils !== "undefined") {
+      const currentText = iti.getNumber(intlTelInputUtils.numberFormat.E164);
+      if (typeof currentText === "string") iti.setNumber(currentText);
+    }
+  });
 });
 
 /*
@@ -61,7 +72,7 @@ Template["intlTelephoneInput"].onRendered(function() {
  * `this` is the new template instance object. Properties you set on this object will be visible from the callbacks added
  *  with onRendered and onDestroyed methods and from event handlers.
  */
-Template["intlTelephoneInput"].onCreated(function() {
+Template["intlTelephoneInput"].onCreated(function () {
   this.iti = new ReactiveVar(false);
 });
 
